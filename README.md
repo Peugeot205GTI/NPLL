@@ -1,7 +1,11 @@
-# NPLL - Nintendo PowerPC Linux Loader
+# NPLL - Nintendo® PowerPC Linux® Loader
 
-TODO
+NPLL is a bootloader for all 3 of Nintendo's PowerPC video game consoles:
+- GameCube®
+- Wii®
+- Wii U®
 
+It provides an interface to load Linux on these platforms, all in one universal binary.
 
 ## Boot Process
 1. `_start` in src/entry.S, then that entire thing executes from top to bottom (set up virtual memory, stack, SDA/SDA2, clear BSS)
