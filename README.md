@@ -10,16 +10,16 @@ It provides an interface to load Linux on these platforms, all in one universal 
 ## Boot Process
 1. `_start` in src/entry.S, then that entire thing executes from top to bottom (set up virtual memory, stack, SDA/SDA2, clear BSS)
 2. `init` in src/init.c, does hardware detection then hands off below
-  a. `initGamecube` in src/gamecube/init.c
+  A. `initGamecube` in src/gamecube/init.c
     1. Go to top-level step 3
-  b. `initWii` in src/wii/init.c
+  B. `initWii` in src/wii/init.c
     1. Check AHBPROT
     2. Set up GPIOs
     3. Map MEM2
     4. Set HID4[SBE]
     5. Clear upper BATs
     6. Go to top-level step 3
-  c. `initWiiU` in src/wiiu/init.c
+  C. `initWiiU` in src/wiiu/init.c
     1. Check AHBPROT
     2. Set up GPIOs
     3. Set HID4[SBE], needed to map the majority of MEM2
