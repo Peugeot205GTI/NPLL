@@ -59,6 +59,7 @@ void E_Init(void)
 {
 	u32 vector;
 	u32 len_2200;
+	puts("E_Init entered");
 
 	for (vector = 0x100; vector < 0x2000; vector += 0x10) {
 		u32 *insn = (u32 *)(0x80000000 + vector);
@@ -73,5 +74,6 @@ void E_Init(void)
 	len_2200 = &exception_2200_end - &exception_2200_start;
 	memcpy((void *)0x80002200, &exception_2200_start, len_2200);
 	sync_before_exec((void *)0x80002200, len_2200);
+	puts("Leaving E_Init");
 }
 
