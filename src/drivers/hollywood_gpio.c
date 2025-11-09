@@ -4,13 +4,28 @@
  * Copyright (C) 2025 Techflash
  */
 
+#include <stdio.h>
+#include <npll/types.h>
 #include <npll/drivers.h>
 #include <npll/hollywood/gpio.h>
 
 static REGISTER_DRIVER(gpioDrv);
 
+static u32 prevIn = 0;
+/* TODO: translate power/eject (and check PI for reset on GCN/Wii) into inputs */
 static void gpioCallback(void) {
-	
+	u32 in = HW_GPIOB_IN;
+
+	if (in & GPIO_POWER && !(prevIn & GPIO_POWER))
+		puts("GPIO: Power button pressed");
+	if (in & GPIO_EJECT_BTN && !(prevIn & GPIO_EJECT_BTN))
+		puts("GPIO: Eject button pressed");
+	if (in & GPIO_SLOT_IN && !(prevIn & GPIO_SLOT_IN))
+		puts("GPIO: Disc inserted");
+	else if (!(in & GPIO_SLOT_IN) && prevIn & GPIO_SLOT_IN)
+		puts("GPIO: Disc removed");
+
+	prevIn = in;
 }
 
 static void gpioInit(void) {
