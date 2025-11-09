@@ -36,8 +36,8 @@ void O_AddDevice(const struct outputDevice *dev) {
 		deviceNum++;
 	else if (deviceNum == 2) { /* added real device */
 		deviceNum++;
-		O_MemlogCleanup();
 		O_DebugCleanup();
+		O_MemlogCleanup();
 	}
 }
 
