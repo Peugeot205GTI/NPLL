@@ -61,6 +61,7 @@ static void usbgeckoCallback(void) {
 static const struct outputDevice outDev = {
 	.writeChar = usbgeckoWriteChar,
 	.writeStr = usbgeckoWriteStr,
+	.name = "USB Gecko",
 	.driver = &usbgeckoDrv,
 	.isGraphical = false,
 	.rows = 80,
