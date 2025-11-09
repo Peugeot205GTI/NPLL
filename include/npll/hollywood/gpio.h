@@ -14,6 +14,7 @@
 #define HW_GPIO_ENABLE _HOLLYWOOD_REG(0xdc)
 #define HW_GPIO_OUT    _HOLLYWOOD_REG(0xe0)
 #define HW_GPIO_DIR    _HOLLYWOOD_REG(0xe4)
+#define HW_GPIO_IN     _HOLLYWOOD_REG(0xe8)
 #define HW_GPIO_OWNER  _HOLLYWOOD_REG(0xfc)
 
 #define GPIO_POWER      (1 << 0)
@@ -40,5 +41,13 @@
 #define GPIO_DEBUG5     (1 << 21)
 #define GPIO_DEBUG6     (1 << 22)
 #define GPIO_DEBUG7     (1 << 23)
+
+/*
+ * has odd effected on the GamePad on Wii U:
+ * - output, active = connected
+ * - output, inactive = disconnected
+ * - input (default state from CafeOS & IOSU) = connected
+ */
+#define GPIO_GAMEPAD_EN (1 << 28)
 
 #endif /* _GPIO_H */

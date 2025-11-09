@@ -5,8 +5,9 @@
  */
 
 #include <stdio.h>
-#include <npll/types.h>
+#include <npll/console.h>
 #include <npll/drivers.h>
+#include <npll/types.h>
 #include <npll/hollywood/gpio.h>
 
 static REGISTER_DRIVER(gpioDrv);
@@ -29,6 +30,22 @@ static void gpioCallback(void) {
 }
 
 static void gpioInit(void) {
+	u32 dir;
+#if 0
+	printf(
+"=== GPIO REGISTER DUMP ===\r\n\
+HW_GPIO_OWNER:  0x%08x\r\n\
+HW_GPIO_ENABLE: 0x%08x\r\n\
+HW_GPIOB_DIR:   0x%08x\r\n\
+HW_GPIOB_OUT:   0x%08x\r\n\
+HW_GPIOB_IN:    0x%08x\r\n\
+HW_GPIO_DIR:    0x%08x\r\n\
+HW_GPIO_OUT:    0x%08x\r\n\
+HW_GPIO_IN:     0x%08x\r\n",
+HW_GPIO_OWNER, HW_GPIO_ENABLE, HW_GPIOB_DIR, HW_GPIOB_OUT,
+HW_GPIOB_IN, HW_GPIO_DIR, HW_GPIO_OUT, HW_GPIO_IN);
+#endif
+
 	/* Broadway owns all */
 	HW_GPIO_OWNER = 0xffffffff;
 
@@ -36,8 +53,12 @@ static void gpioInit(void) {
 	HW_GPIO_ENABLE = 0xffffffff;
 
 	/* set proper directions */
-	HW_GPIOB_DIR = ~(GPIO_POWER | GPIO_EJECT_BTN | GPIO_SLOT_IN | GPIO_EEP_MISO | GPIO_AVE_SDA);
-	HW_GPIO_DIR  = HW_GPIOB_DIR;
+	dir = ~(GPIO_POWER | GPIO_EJECT_BTN | GPIO_SLOT_IN | GPIO_EEP_MISO | GPIO_AVE_SDA);
+	if (H_ConsoleType == CONSOLE_TYPE_WII_U)
+		dir &= ~GPIO_GAMEPAD_EN;
+
+	HW_GPIOB_DIR = dir;
+	HW_GPIO_DIR  = dir;
 
 	/* set up outputs properly */
 	HW_GPIOB_OUT = GPIO_DC_DC | GPIO_FAN | GPIO_SENSOR_BAR | GPIO_SLOT_LED;
