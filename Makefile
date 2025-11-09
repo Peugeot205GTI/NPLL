@@ -9,7 +9,7 @@ CC      := powerpc-unknown-linux-gnu-gcc
 endif
 
 ASFLAGS :=
-CFLAGS  := -mregnames -mcpu=750 -mno-eabi -mno-sdata -Iinclude -g -nostdinc -ffreestanding -fno-jump-tables -fno-omit-frame-pointer
+CFLAGS  := -mregnames -mcpu=750 -mno-eabi -mno-sdata -Iinclude -ggdb3 -nostdinc -ffreestanding -fno-jump-tables -fno-omit-frame-pointer
 LDFLAGS := -nostdlib -nostartfiles -T src/linkerscript.ld
 
 SOURCE  := entry.S gamecube/init.c wii/init.c wiiu/init.c timer.c panic.c init.c drivers.c output.c main.c menu.c video.c input.c memlog.c exception.c exception_2200.S font.c
