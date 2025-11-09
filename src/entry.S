@@ -116,13 +116,18 @@ setupBATs:
 	mtspr IBAT1U, r4
 	mtspr DBAT1U, r4
 
+	# enable and invalidate the caches
+	mfspr r0, HID0
+	ori r0, r0, HID0_ICE | HID0_ICFI | HID0_DCE | HID0_DCFI
+	mtspr HID0, r0
+
 	# flush the changes
 	sync
 	isync
 
 	# prepare to flip IR and DR on
 	mfmsr r0
-	ori r0, r0, MSR_IR|MSR_DR
+	ori r0, r0, MSR_IR | MSR_DR
 	mtsrr1 r0
 
 	# Alright, we've made the hardware sane, lets get back to real code

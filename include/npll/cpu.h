@@ -44,6 +44,7 @@
 #define DBAT7U 574
 #define DBAT7L 575
 
+#define HID0   1008
 #define HID4   1011
 
 
@@ -54,7 +55,13 @@
 #define MSR_IR (1 << (31 - 26))
 #define MSR_DR (1 << (31 - 27))
 
-/* HID4 balues */
+/* HID0 values */
+#define HID0_ICE  (1 << (31 - 16))
+#define HID0_DCE  (1 << (31 - 17))
+#define HID0_ICFI (1 << (31 - 20))
+#define HID0_DCFI (1 << (31 - 21))
+
+/* HID4 values */
 #define HID4_SBE (1 << (31 - 6))
 
 #define SETBAT_TYPE_DATA (1 << 0)
