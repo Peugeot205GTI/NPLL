@@ -62,7 +62,9 @@ static __attribute__((noreturn)) void wiiPanic(const char *str) {
 }
 
 static struct platOps wiiPlatOps = {
-	.panic = wiiPanic
+	.panic = wiiPanic,
+	.debugWriteChar = NULL,
+	.debugWriteStr = NULL
 };
 
 void __attribute__((noreturn)) H_InitWii(void) {

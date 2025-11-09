@@ -16,22 +16,25 @@
 enum wiiuRev H_WiiURev;
 
 
-static void wiiuDebugStr(const char *str) {
+static void wiiuDebugChar(const char c) {
 	u32 msg;
+
+	msg = LATTE_IPC_CMD_PRINT | (c << 16);
+
+	/* linux-loader sits on the "legacy" Hollywood IPC block */
+	HW_IPC_PPCMSG = msg; /* set our data */
+	HW_IPC_PPCCTRL = HW_IPC_PPCCTRL_X1; /* tell Starbuck we're ready */
+
+	/* spin until Starbuck processes our message */
+	while (HW_IPC_PPCCTRL & HW_IPC_PPCCTRL_X1);
+}
+
+static void wiiuDebugStr(const char *str) {
 	while (*str) {
-		msg = LATTE_IPC_CMD_PRINT | (*str << 16);
-
-		/* linux-loader sits on the "legacy" Hollywood IPC block */
-		HW_IPC_PPCMSG = msg; /* set our data */
-		HW_IPC_PPCCTRL = HW_IPC_PPCCTRL_X1; /* tell Starbuck we're ready */
-
-		/* spin until Starbuck processes our message */
-		while (HW_IPC_PPCCTRL & HW_IPC_PPCCTRL_X1);
-
+		wiiuDebugChar(*str);
 		str++;
 	}
 }
-
 
 static __attribute__((noreturn)) void wiiuPanic(const char *str) {
 	int i;
@@ -59,7 +62,9 @@ static __attribute__((noreturn)) void wiiuPanic(const char *str) {
 }
 
 static struct platOps wiiuPlatOps = {
-	.panic = wiiuPanic
+	.panic = wiiuPanic,
+	.debugWriteChar = wiiuDebugChar,
+	.debugWriteStr = wiiuDebugStr
 };
 
 void __attribute__((noreturn)) H_InitWiiU(void) {
@@ -150,6 +155,7 @@ void __attribute__((noreturn)) H_InitWiiU(void) {
 	D_DriverMask = DRIVER_ALLOW_WIIU;
 
 	/* kick off the real init */
+	wiiuDebugStr("About to enter I_InitCommon\n");
 	I_InitCommon();
 
 	wiiuPanic("I_InitCommon should not return");

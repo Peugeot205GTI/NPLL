@@ -29,5 +29,7 @@ extern void O_AddDevice(const struct outputDevice *dev);
 extern void O_RemoveDevice(const struct outputDevice *dev);
 extern void O_MemlogInit(void);
 extern void O_MemlogCleanup(void);
+extern void O_DebugInit(void);
+extern void O_DebugCleanup(void);
 
 #endif /* _OUTPUT_H */

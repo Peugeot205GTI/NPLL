@@ -31,6 +31,8 @@ enum wiiuRev {
 
 struct platOps {
 	void __attribute__((noreturn)) (*panic)(const char *str);
+	void (*debugWriteChar)(const char c);
+	void (*debugWriteStr)(const char *str);
 };
 
 extern enum consoleType H_ConsoleType;

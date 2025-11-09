@@ -79,6 +79,7 @@ int init(void) {
 
 void __attribute__((noreturn)) I_InitCommon(void) {
 	puts("I_InitCommon entered");
+	O_DebugInit();
 	E_Init();
 	D_Init();
 	puts("Driver initialization done, entering mainLoop");

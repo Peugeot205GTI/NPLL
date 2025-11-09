@@ -12,7 +12,7 @@ ASFLAGS :=
 CFLAGS  := -mregnames -mcpu=750 -mno-eabi -mno-sdata -Iinclude -ggdb3 -nostdinc -ffreestanding -fno-jump-tables -fno-omit-frame-pointer
 LDFLAGS := -nostdlib -nostartfiles -T src/linkerscript.ld
 
-SOURCE  := entry.S gamecube/init.c wii/init.c wiiu/init.c timer.c panic.c init.c drivers.c output.c main.c menu.c video.c input.c memlog.c exception.c exception_2200.S font.c
+SOURCE  := entry.S gamecube/init.c wii/init.c wiiu/init.c timer.c panic.c init.c drivers.c output.c main.c menu.c video.c input.c memlog.c platOps_debug.c exception.c exception_2200.S font.c
 SOURCE  += libc/printf.c libc/output.c libc/string.c libc/cc-runtime.c
 SOURCE  += drivers/hollywood_gpio.c drivers/exi.c drivers/usbgecko.c drivers/vi.c drivers/latte_framebuffer.c
 

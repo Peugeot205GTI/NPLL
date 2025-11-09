@@ -14,8 +14,7 @@
 
 int O_NumDevices = 0;
 const struct outputDevice *O_Devices[MAX_DEV];
-static bool firstDevice = true; /* memlog */
-static bool secondDevice = false; /* real output device */
+static int deviceNum = 0; /* 0 = memlog, 1 = debug, >1 = real device */
 
 void O_AddDevice(const struct outputDevice *dev) {
 	char *name = "NULL", *driver = "NULL";
@@ -31,13 +30,14 @@ void O_AddDevice(const struct outputDevice *dev) {
 	O_Devices[O_NumDevices] = dev;
 	O_NumDevices++;
 
-	if (firstDevice) {
-		firstDevice = false;
-		secondDevice = true;
-	}
-	else if (secondDevice) {
-		secondDevice = false;
+	if (deviceNum == 0) /* added memlog */
+		deviceNum++;
+	else if (deviceNum == 1) /* added debug */
+		deviceNum++;
+	else if (deviceNum == 2) { /* added real device */
+		deviceNum++;
 		O_MemlogCleanup();
+		O_DebugCleanup();
 	}
 }
 

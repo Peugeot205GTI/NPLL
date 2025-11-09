@@ -27,7 +27,9 @@ static __attribute__((noreturn)) void gamecubePanic(const char *str) {
 }
 
 static struct platOps gamecubePlatOps = {
-	.panic = gamecubePanic
+	.panic = gamecubePanic,
+	.debugWriteChar = NULL,
+	.debugWriteStr = NULL
 };
 
 void __attribute__((noreturn)) H_InitGameCube(void) {
