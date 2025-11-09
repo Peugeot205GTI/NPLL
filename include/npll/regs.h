@@ -14,14 +14,24 @@
 #define _LATTE_REG(x) _HOLLYWOOD_REG(x)
 
 /* Flipper Registers */
-#define PI_RESET   _FLIPPER_REG(0x3024)
+#define PI_RESET        _FLIPPER_REG(0x3024)
 
 /* Hollywood Registers */
-#define HW_AHBPROT _HOLLYWOOD_REG(0x64)
-#define HW_AIPROT  _HOLLYWOOD_REG(0x70)
-#define HW_RESETS  _HOLLYWOOD_REG(0x194)
-#  define RESETS_RSTBINB (1 << 0)
-#define HW_VERSION _HOLLYWOOD_REG(0x214)
+#define HW_IPC_PPCMSG  _HOLLYWOOD_REG(0x00)
+#define HW_IPC_PPCCTRL _HOLLYWOOD_REG(0x04)
+#  define HW_IPC_PPCCTRL_X1  (1 << 0)
+#  define HW_IPC_PPCCTRL_Y2  (1 << 1)
+#  define HW_IPC_PPCCTRL_Y1  (1 << 2)
+#  define HW_IPC_PPCCTRL_X2  (1 << 3)
+#  define HW_IPC_PPCCTRL_IY1 (1 << 4)
+#  define HW_IPC_PPCCTRL_IY2 (1 << 5)
+#define HW_IPC_ARMMSG  _HOLLYWOOD_REG(0x08)
+#define HW_IPC_ARMCTRL _HOLLYWOOD_REG(0x0c)
+#define HW_AHBPROT     _HOLLYWOOD_REG(0x64)
+#define HW_AIPROT      _HOLLYWOOD_REG(0x70)
+#define HW_RESETS      _HOLLYWOOD_REG(0x194)
+#  define RESETS_RSTBINB     (1 << 0)
+#define HW_VERSION     _HOLLYWOOD_REG(0x214)
 
 
 /* Latte Registers */
