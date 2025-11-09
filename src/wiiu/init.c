@@ -11,13 +11,38 @@
 #include <npll/timer.h>
 #include <npll/drivers.h>
 #include <npll/cpu.h>
+#include <npll/latte/ipc.h>
 
 enum wiiuRev H_WiiURev;
+
+
+static void wiiuDebugStr(const char *str) {
+	u32 msg;
+	while (*str) {
+		msg = LATTE_IPC_CMD_PRINT | (*str << 16);
+
+		/* linux-loader sits on the "legacy" Hollywood IPC block */
+		HW_IPC_PPCMSG = msg; /* set our data */
+		HW_IPC_PPCCTRL = HW_IPC_PPCCTRL_X1; /* tell Starbuck we're ready */
+
+		/* spin until Starbuck processes our message */
+		while (HW_IPC_PPCCTRL & HW_IPC_PPCCTRL_Y1);
+
+		str++;
+
+		/* XXX: give it 1ms, Starbuck seems to hang if we hammer it too hard */
+		udelay(1000 * 1);
+	}
+}
+
 
 static __attribute__((noreturn)) void wiiuPanic(const char *str) {
 	int i;
 	(void)str;
 
+	wiiuDebugStr(str);
+
+#if 0
 	udelay(1000 * 2500);
 
 	/* try a HW_RESETS reset */
@@ -28,6 +53,7 @@ static __attribute__((noreturn)) void wiiuPanic(const char *str) {
 
 	/* try a PI reset */
 	PI_RESET = 0x00;
+#endif
 
 	/* wacky, just hang */
 	while (1) {
@@ -41,6 +67,8 @@ static struct platOps wiiuPlatOps = {
 
 void __attribute__((noreturn)) H_InitWiiU(void) {
 	u32 batl, batu, hid4;
+
+	wiiuDebugStr("Hello from NPLL in H_InitWiiU\n");
 
 	/* We'd better have AHBPROT... */
 	if (HW_AHBPROT != 0xffffffff) {
