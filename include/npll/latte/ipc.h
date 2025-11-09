@@ -6,6 +6,7 @@
  */
 
 #ifndef _LATTE_IPC_H
+#define _LATTE_IPC_H
 
 #define LATTE_IPC_CMD_PRINT 0x01000000
 #define LATTE_IPC_CMD_POWEROFF 0xcafe0001
