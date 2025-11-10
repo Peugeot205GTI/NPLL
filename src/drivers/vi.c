@@ -37,7 +37,7 @@ static REGISTER_DRIVER(viDrv);
 /* most TVs crop off the top and bottom-most ~16px - try to account for that here */
 #define XFB_OS_COMP_PIX 16
 static u32 __attribute__((aligned(32))) rgbFb[XFB_WIDTH * XFB_HEIGHT] = { 0 };
-static u32 __attribute__((aligned(32))) xfb[XFB_WIDTH * XFB_HEIGHT] = { 0 };
+static u16 __attribute__((aligned(32))) xfb[XFB_WIDTH * XFB_HEIGHT] = { 0 };
 
 
 static inline u32 read32(u32 addr)
@@ -494,7 +494,7 @@ static void clear_fb(rgb fill_rgb) {
 
 	u32 fill_yuv = make_yuv(fill_rgb, fill_rgb);
 
-	fb  = xfb;
+	fb  = (u32 *)xfb;
 	for (i = 0; i < XFB_HEIGHT * 2 * (XFB_WIDTH >> 1); i++) {
 		*fb = fill_yuv;
 		dcache_flush(fb, 4);
@@ -522,7 +522,7 @@ static void viFlush(void) {
 	rgb rgb1, rgb2;
 
 	src  = rgbFb;
-	dest = xfb;
+	dest = (u32 *)xfb;
 	for (i = 0; i < XFB_HEIGHT * 2 * (XFB_WIDTH >> 1); i++) {
 		rgb1 = (rgb)*src;
 		src++;
