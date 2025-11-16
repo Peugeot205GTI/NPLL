@@ -39,40 +39,6 @@ static REGISTER_DRIVER(viDrv);
 static u32 __attribute__((aligned(32))) rgbFb[XFB_WIDTH * XFB_HEIGHT] = { 0 };
 static u16 __attribute__((aligned(32))) xfb[XFB_WIDTH * XFB_HEIGHT] = { 0 };
 
-
-static inline u32 read32(u32 addr)
-{
-	u32 x;
-
-	asm volatile("lwz %0,0(%1) ; sync" : "=r"(x) : "b"(0xc0000000 | addr));
-
-	return x;
-}
-
-static inline void write32(u32 addr, u32 x)
-{
-	asm("stw %0,0(%1) ; eieio" : : "r"(x), "b"(0xc0000000 | addr));
-}
-
-static inline void mask32(u32 addr, u32 clear, u32 set)
-{
-	write32(addr, (read32(addr)&(~clear)) | set);
-}
-
-static inline u16 read16(u32 addr)
-{
-	u16 x;
-
-	asm volatile("lhz %0,0(%1) ; sync" : "=r"(x) : "b"(0xc0000000 | addr));
-
-	return x;
-}
-
-static inline void write16(u32 addr, u16 x)
-{
-	asm("sth %0,0(%1) ; eieio" : : "r"(x), "b"(0xc0000000 | addr));
-}
-
 #ifdef VI_DEBUG
 #define  VI_debug(f, arg...) printf("VI: " f, ##arg);
 #else
@@ -128,9 +94,9 @@ void VIDEO_Init(int VideoMode)
 	const u16 *video_initstate=NULL;
 
 	VI_debug("Resetting VI...\n");
-	write16(R_VIDEO_STATUS1, 2);
+	R_VIDEO_STATUS1 = 2;
 	udelay(2);
-	write16(R_VIDEO_STATUS1, 0);
+	R_VIDEO_STATUS1 = 0;
 	VI_debug("VI reset...\n");
 
 	switch(VideoMode)
@@ -162,18 +128,18 @@ void VIDEO_Init(int VideoMode)
 	for(Counter=0; Counter<64; Counter++)
 	{
 		if(Counter==1)
-			write16(MEM_VIDEO_BASE + 2*Counter, video_initstate[Counter] & 0xFFFE);
+			*(vu16 *)(MEM_VIDEO_BASE + 2*Counter) = video_initstate[Counter] & 0xFFFE;
 		else
-			write16(MEM_VIDEO_BASE + 2*Counter, video_initstate[Counter]);
+			*(vu16 *)(MEM_VIDEO_BASE + 2*Counter) = video_initstate[Counter];
 	}
 
 	video_mode = VideoMode;
 
-	write16(R_VIDEO_STATUS1, video_initstate[1]);
+	R_VIDEO_STATUS1 = video_initstate[1];
 #ifdef VI_DEBUG
 	VI_debug("VI dump:\n");
 	for(Counter=0; Counter<32; Counter++)
-		printf("%02x: %04x %04x,\n", Counter*4, read16(MEM_VIDEO_BASE + Counter*4), read16(MEM_VIDEO_BASE + Counter*4+2));
+		printf("%02x: %04x %04x,\n", Counter*4, *(vu16 *)(MEM_VIDEO_BASE + Counter*4), *(vu16 *)(MEM_VIDEO_BASE + Counter*4+2));
 
 	printf("---\n");
 #endif
@@ -183,16 +149,16 @@ void VIDEO_SetFrameBuffer(void *FrameBufferAddr)
 {
 	u32 fb = (u32)FrameBufferAddr & ~0xc0000000; /* physical addr */
 
-	write32(R_VIDEO_FRAMEBUFFER_1, (fb >> 5) | 0x10000000);
+	R_VIDEO_FRAMEBUFFER_1 = (fb >> 5) | 0x10000000;
 	if(video_mode != VIDEO_640X480_NTSCp_YUV16)
 		fb += 2 * 640; // 640 pixels == 1 line
-	write32(R_VIDEO_FRAMEBUFFER_2, (fb >> 5) | 0x10000000);
+	R_VIDEO_FRAMEBUFFER_2 = (fb >> 5) | 0x10000000;
 }
 
 void VIDEO_WaitVSync(void)
 {
-	while(read16(R_VIDEO_HALFLINE_1) >= 200);
-	while(read16(R_VIDEO_HALFLINE_1) <  200);
+	while(R_VIDEO_HALFLINE_1 >= 200);
+	while(R_VIDEO_HALFLINE_1 <  200);
 }
 
 /* black out video (not reversible!) */
@@ -200,14 +166,14 @@ void VIDEO_BlackOut(void)
 {
 	VIDEO_WaitVSync();
 
-	int active = read32(R_VIDEO_VTIMING) >> 4;
+	int active = R_VIDEO_VTIMING >> 4;
 
-	write32(R_VIDEO_PRB_ODD, read32(R_VIDEO_PRB_ODD) + ((active<<1)-2));
-	write32(R_VIDEO_PRB_EVEN, read32(R_VIDEO_PRB_EVEN) + ((active<<1)-2));
-	write32(R_VIDEO_PSB_ODD, read32(R_VIDEO_PSB_ODD) + 2);
-	write32(R_VIDEO_PSB_EVEN, read32(R_VIDEO_PSB_EVEN) + 2);
+	R_VIDEO_PRB_ODD = R_VIDEO_PRB_ODD + ((active<<1)-2);
+	R_VIDEO_PRB_EVEN = R_VIDEO_PRB_EVEN + ((active<<1)-2);
+	R_VIDEO_PSB_ODD = R_VIDEO_PSB_ODD + 2;
+	R_VIDEO_PSB_EVEN = R_VIDEO_PSB_EVEN + 2;
 
-	mask32(R_VIDEO_VTIMING, 0xfffffff0, 0);
+	R_VIDEO_VTIMING &= ~0xfffffff0;
 }
 
 //static vu16* const _viReg = (u16*)0xCC002000;
@@ -215,35 +181,35 @@ void VIDEO_BlackOut(void)
 void VIDEO_Shutdown(void)
 {
 	VIDEO_BlackOut();
-	write16(R_VIDEO_STATUS1, 0);
+	R_VIDEO_STATUS1 = 0;
 }
 
 #define SLAVE_AVE 0xe0
 
 static inline void aveSetDirection(u32 dir)
 {
-	u32 val = (read32(HW_GPIOB_DIR)&~0x8000)|0x4000;
+	u32 val = (HW_GPIOB_DIR & ~0x8000)|0x4000;
 	if(dir) val |= 0x8000;
-	write32(HW_GPIOB_DIR, val);
+	HW_GPIOB_DIR = val;
 }
 
 static inline void aveSetSCL(u32 scl)
 {
-	u32 val = read32(HW_GPIOB_OUT)&~0x4000;
+	u32 val = HW_GPIOB_OUT & ~0x4000;
 	if(scl) val |= 0x4000;
-	write32(HW_GPIOB_OUT, val);
+	HW_GPIOB_OUT = val;
 }
 
 static inline void aveSetSDA(u32 sda)
 {
-	u32 val = read32(HW_GPIOB_OUT)&~0x8000;
+	u32 val = HW_GPIOB_OUT & ~0x8000;
 	if(sda) val |= 0x8000;
-	write32(HW_GPIOB_OUT, val);
+	HW_GPIOB_OUT = val;
 }
 
 static inline u32 aveGetSDA()
 {
-	if(read32(HW_GPIOB_IN)&0x8000)
+	if(HW_GPIOB_IN & 0x8000)
 		return 1;
 	else
 		return 0;
@@ -423,7 +389,7 @@ void VISetupEncoder(void)
 	u8 dtv;
 
 	//tv = VIDEO_GetCurrentTvMode();
-	dtv = read16(R_VIDEO_VISEL) & 1;
+	dtv = R_VIDEO_VISEL & 1;
 	//oldDtvStatus = dtv;
 
 	// SetRevolutionModeSimple
