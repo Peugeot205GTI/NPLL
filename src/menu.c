@@ -28,19 +28,14 @@ void M_Init(void) {
 }
 
 static u64 lastTb = 0;
-static u32 flushes = 0;
 void M_Redraw(void) {
 	int i;
 	u64 tb = mftb();
 	if (T_HasElapsed(lastTb, 1000 * 1000)) {
+		puts("a");
 		lastTb = tb;
-		printf("V_Flush's in last second: %u\r\n", flushes);
-		V_Flush();
-		flushes = 0;
 		return;
 	}
-	V_Flush();
-	flushes++;
 	if (!hasChanged)
 		return;
 
