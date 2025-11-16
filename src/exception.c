@@ -35,20 +35,20 @@ void E_Handler(int exception)
 	u32 *x;
 	u32 i;
 
-	printf("\nException %04x occurred!\n", exception);
+	printf("\r\nException %04x occurred!\r\n", exception);
 
 	x = (u32 *)0x80002000;
 
-	printf("\n R0..R7    R8..R15  R16..R23  R24..R31\n");
+	printf("\r\n R0..R7    R8..R15  R16..R23  R24..R31\r\n");
 	for (i = 0; i < 8; i++) {
-		printf("%08x  %08x  %08x  %08x\n", x[0], x[8], x[16], x[24]);
+		printf("%08x  %08x  %08x  %08x\r\n", x[0], x[8], x[16], x[24]);
 		x++;
 	}
 	x = (u32 *)0x80002080;
 
-	printf("\n CR/XER    LR/CTR  SRR0/SRR1 DAR/DSISR\n");
+	printf("\r\n CR/XER    LR/CTR  SRR0/SRR1 DAR/DSISR\r\n");
 	for (i = 0; i < 2; i++) {
-		printf("%08x  %08x  %08x  %08x\n", x[0], x[2], x[4], x[6]);
+		printf("%08x  %08x  %08x  %08x\r\n", x[0], x[2], x[4], x[6]);
 		x++;
 	}
 
